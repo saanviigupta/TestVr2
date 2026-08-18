@@ -2,14 +2,18 @@
  * items.js  —  Kawaii Bakery (v7)
  *
  * Gameplay, counts, spawn logic and visuals are UNCHANGED from v6.
- * Only two things changed:
+ * Only three things changed:
  *   1. Extra drop-zone Y positions were LOWERED to match the lowered
  *      shelves in index.html (brownies, macarons, muffins, forks, spoons).
  *   2. Fork + spoon visuals now lie PARALLEL to the floor instead of
  *      standing upright / tilted.
+ *   3. The two side-wall zones (forks/spoons) use a pad oriented ALONG the
+ *      wall instead of across it, so it no longer pokes through the wall.
+ *      The hit volume is the same size or larger — placement is exactly as
+ *      forgiving as before.
  *
- * The invisible raycast/grab collision boxes are untouched — grabbing is
- * exactly as forgiving as before.
+ * The invisible raycast/grab collision boxes on ITEMS are untouched —
+ * grabbing is exactly as forgiving as before.
  */
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -87,6 +91,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
     extraZones.forEach((z) => {
       if (document.getElementById(z.id)) return;
+
+      // Fork/spoon zones sit on the RIGHT WALL shelf: their pad has to run
+      // along Z (the length of the shelf) rather than along X (through the
+      // wall). The face the player actually aims at is bigger this way, so
+      // placement stays at least as easy as before.
+      const onSideWall = z.pos.startsWith('5.77');
+
       const el = document.createElement('a-entity');
       el.setAttribute('id', z.id);
       el.setAttribute('class', 'drop-zone');
@@ -96,13 +107,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
       // Invisible raycast-hit geometry on the parent so cursor/laser events
       // fire on the .drop-zone entity (where the drop-zone component listens).
-      el.setAttribute('geometry', 'primitive: box; width: 0.8; height: 0.12; depth: 0.32');
+      el.setAttribute('geometry', onSideWall
+        ? 'primitive: box; width: 0.32; height: 0.14; depth: 0.7'
+        : 'primitive: box; width: 0.8; height: 0.12; depth: 0.32');
       el.setAttribute('material', 'opacity: 0; transparent: true; shader: flat');
 
       const box = document.createElement('a-box');
-      box.setAttribute('width', '0.75');
+      box.setAttribute('width',  onSideWall ? '0.24' : '0.75');
       box.setAttribute('height', '0.07');
-      box.setAttribute('depth', '0.28');
+      box.setAttribute('depth',  onSideWall ? '0.6'  : '0.28');
       box.setAttribute('class', 'zone-visual');
       box.setAttribute('material',
         'color: #ffd0e8; opacity: 0.5; transparent: true; emissive: #ff80c0; emissiveIntensity: 0.45');
@@ -115,7 +128,7 @@ window.addEventListener('DOMContentLoaded', () => {
       txt.setAttribute('width', '3.5');
       txt.setAttribute('color', '#a0006a');
       // Fork/spoon zones on the side wall need rotated text
-      if (z.pos.startsWith('5.77')) {
+      if (onSideWall) {
         txt.setAttribute('rotation', '0 -90 0');
         txt.setAttribute('position', '-0.3 0.22 0');
       }

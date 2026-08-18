@@ -177,12 +177,13 @@
   </a-entity>
 
   <!-- ═══════════ INSTRUCTION BILLBOARDS ═══════════
-       Billboard 1 = 0–15s (front, above the main shelf).
+       Billboard 1 = 0–15s (front, high above the main shelf so it never
+       covers the shelf drop-zone labels).
        Billboard 2 = 16–30s (right wall, so the player looks around).
        Both hidden after 30s. Shown/hidden with visible=true/false by the
        billboard-sequence component. Not interactable — the cursor raycaster
        only targets .interactable / .drop-zone. -->
-  <a-entity id="billboard-1" visible="true" position="0 2.6 -5.28">
+  <a-entity id="billboard-1" visible="true" position="0 3.15 -5.15">
     <a-plane width="3.5" height="1.35" position="0 0 -0.02"
       material="color: #ff9ab5; shader: flat"></a-plane>
     <a-plane width="3.35" height="1.2"
